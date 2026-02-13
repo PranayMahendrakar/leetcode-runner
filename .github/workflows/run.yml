@@ -2,7 +2,7 @@ name: Run Script
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 0 * * *'  # Triggers daily at midnight UTC
   workflow_dispatch:
 
 jobs:
@@ -10,10 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Random delay (1-10 hours)
+        run: |
+          DELAY=$(( (RANDOM % 10 + 1) * 3600 ))
+          HOURS=$(( DELAY / 3600 ))
+          echo "Sleeping for $HOURS hours ($DELAY seconds)..."
+          sleep $DELAY
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python leetcode_submit.py
+
+      - name: Run script
+        run: python leetcode_submit.py
         env:
           LEETCODE_CSRF: ${{ secrets.LEETCODE_CSRF }}
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
