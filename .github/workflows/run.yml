@@ -3,15 +3,17 @@ name: Run Script
 on:
   schedule:
     - cron: '0 0 * * *'  # Triggers daily at midnight UTC
-  workflow_dispatch:
+  workflow_dispatch:       # Manual trigger runs instantly
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 660   # 11 hours max (to allow up to 10hr delay)
     steps:
       - uses: actions/checkout@v4
 
-      - name: Random delay (1-10 hours)
+      - name: Random delay (1-10 hours) - only on scheduled runs
+        if: github.event_name == 'schedule'
         run: |
           DELAY=$(( (RANDOM % 10 + 1) * 3600 ))
           HOURS=$(( DELAY / 3600 ))
