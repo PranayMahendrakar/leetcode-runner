@@ -2,22 +2,28 @@ name: Run Script
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Triggers daily at midnight UTC
-  workflow_dispatch:       # Manual trigger runs instantly
+    # Multiple random-looking times throughout the day (UTC)
+    - cron: '23 3 * * *'   # ~3:23 AM UTC
+    - cron: '47 7 * * *'   # ~7:47 AM UTC
+    - cron: '12 11 * * *'  # ~11:12 AM UTC
+    - cron: '38 15 * * *'  # ~3:38 PM UTC
+    - cron: '5 19 * * *'   # ~7:05 PM UTC
+    - cron: '51 22 * * *'  # ~10:51 PM UTC
+  workflow_dispatch:          # Manual trigger
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 660   # 11 hours max (to allow up to 10hr delay)
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Random delay (1-10 hours) - only on scheduled runs
+      - name: Random short delay (1-20 min)
         if: github.event_name == 'schedule'
         run: |
-          DELAY=$(( (RANDOM % 10 + 1) * 3600 ))
-          HOURS=$(( DELAY / 3600 ))
-          echo "Sleeping for $HOURS hours ($DELAY seconds)..."
+          DELAY=$((RANDOM % 1200 + 60))
+          MINS=$((DELAY / 60))
+          echo "Sleeping for $MINS minutes ($DELAY seconds)..."
           sleep $DELAY
 
       - uses: actions/setup-python@v5
